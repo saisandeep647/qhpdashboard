@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QHP | Parcel Booking</title>
+    <style>
+        :root { --primary: #0D47A1; --accent: #9c27b0; --bg: #f4f7fb; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); display: flex; min-height: 100vh; }
+        
+        /* Sidebar Navigation */
+        .sidebar { width: 260px; background: #fff; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 40px; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .sidebar li a { text-decoration: none; color: #333; display: flex; align-items: center; gap: 12px; }
+        .active-page { background: var(--accent); color: white; border-radius: 12px; }
+        .active-page a { color: white !important; }
+
+        /* Main Content */
+        .main { flex: 1; padding: 40px; display: flex; justify-content: center; align-items: flex-start; }
+        .booking-box { background: white; padding: 40px; border-radius: 25px; width: 100%; max-width: 600px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        
+        h2 { color: var(--accent); margin-bottom: 25px; }
+        .size-selection { display: flex; gap: 15px; margin-bottom: 20px; }
+        .size-card { flex: 1; padding: 20px; border: 2px solid #eee; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .size-card.selected { border-color: var(--accent); background: #fdf7fe; }
+        
+        label { font-weight: bold; display: block; margin-top: 15px; color: #333; }
+        input { width:100%; padding: 15px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; }
+        .submit-btn { width:100%; padding: 18px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">QHP <span>Partner</span></div>
+        <ul>
+            <li><a href="userdashboard.html">🏠 Dashboard</a></li>
+            <li><a href="food.html">🍔 Order Food</a></li>
+            <li><a href="medicine.html">💊 Medicine Order</a></li>
+            <li><a href="#">🛒 Grocery</a></li>
+            <li class="active-page"><a href="parcel.html">📦 Parcel Booking</a></li>
+            <li><a href="#">📍 Track Order</a></li>
+            <li><a href="#">💳 Wallet</a></li>
+            <li><a href="#">👤 Profile</a></li>
+            <li><a href="#">⚙ Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="booking-box">
+            <h2>📦 Book a Parcel Delivery</h2>
+            
+            <label>Select Vehicle Option:</label>
+            <div class="size-selection">
+                <div class="size-card" id="smallCard" onclick="selectSize('Small')">
+                    <h4>🛵 Small</h4><small>2-Wheeler</small>
+                </div>
+                <div class="size-card" id="largeCard" onclick="selectSize('Large')">
+                    <h4>🛺 Large</h4><small>3/4-Wheeler</small>
+                </div>
+            </div>
+
+            <label>Pickup Point:</label>
+            <input type="text" id="pickupPoint" placeholder="Enter pickup address">
+
+            <label>Drop Point:</label>
+            <input type="text" id="dropPoint" placeholder="Enter drop-off address">
+
+            <button class="submit-btn" id="sendRequestBtn">Send Parcel Request</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsCDXYRerEZn_5--6f8ta1BAD-hIv1PiI",
+            databaseURL: "https://qhp2026-d510b-default-rtdb.firebaseio.com",
+            projectId: "qhp2026-d510b"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let selectedSize = "Small";
+        window.selectSize = (size) => {
+            selectedSize = size;
+            document.getElementById('smallCard').classList.toggle('selected', size === 'Small');
+            document.getElementById('largeCard').classList.toggle('selected', size === 'Large');
+        };
+        
+        // Initialize selection
+        window.selectSize("Small");
+
+        document.getElementById('sendRequestBtn').addEventListener('click', () => {
+            push(ref(db, 'parcel_requests/'), {
+                size: selectedSize,
+                pickup: document.getElementById('pickupPoint').value,
+                drop: document.getElementById('dropPoint').value,
+                status: "Pending"
+            }).then(() => alert("Request Posted!"));
+        });
+    </script>
+</body>
+</html>
