@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QHP | Food Order</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root { --primary: #0D47A1; --accent: #FF9800; --bg: #f4f7fb; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); display: flex; min-height: 100vh; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; background: #fff; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 40px; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .sidebar li a { text-decoration: none; color: #333; display: flex; align-items: center; gap: 12px; }
+        .active-page { background: var(--primary); color: white; border-radius: 12px; }
+        .active-page a { color: white !important; }
+
+        /* Main Content */
+        .main { flex: 1; padding: 40px; display: flex; justify-content: center; }
+        .form-card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 650px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .pill-container { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .pill { padding: 8px 16px; background: #f0f4ff; border-radius: 20px; cursor: pointer; color: var(--primary); font-size: 14px; border: 1px solid var(--primary); }
+        .pill:hover { background: var(--primary); color: white; }
+        
+        input, textarea { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; }
+        #map { height: 200px; border-radius: 15px; margin-bottom: 15px; border: 2px solid #eee; }
+        .submit-btn { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">QHP <span>Partner</span></div>
+        <ul>
+            <li><a href="userdashboard.html">🏠 Dashboard</a></li>
+            <li class="active-page"><a href="food.html">🍔 Order Food</a></li>
+            <li><a href="medicine.html">💊 Medicine Order</a></li>
+            <li><a href="#">🛒 Grocery</a></li>
+            <li><a href="#">📦 Parcel Booking</a></li>
+            <li><a href="#">📍 Track Order</a></li>
+            <li><a href="#">💳 Wallet</a></li>
+            <li><a href="#">👤 Profile</a></li>
+            <li><a href="#">⚙ Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="form-card">
+            <h2>Request Food</h2>
+            <label>Quick Selection:</label>
+            <div class="pill-container">
+                <span class="pill" onclick="addFood('Pizza')">🍕 Pizza</span>
+                <span class="pill" onclick="addFood('Biryani')">🥘 Biryani</span>
+                <span class="pill" onclick="addFood('Burger')">🍔 Burger</span>
+                <span class="pill" onclick="addFood('Ice Cream')">🍦 Ice Cream</span>
+            </div>
+
+            <input type="text" id="userName" placeholder="Your Full Name">
+            <div id="map"></div>
+            <input type="text" id="userAddress" placeholder="Location Coordinates" readonly>
+            <textarea id="foodDetails" placeholder="Detailed order (e.g. 2x Veg Pizza, No onions)" rows="3"></textarea>
+            
+            <button class="submit-btn" id="postBtn">Post Request</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize Map
+        const map = L.map('map').setView([17.0005, 81.7807], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        const marker = L.marker([17.0005, 81.7807], {draggable: true}).addTo(map);
+        
+        marker.on('dragend', () => {
+            const pos = marker.getLatLng();
+            document.getElementById('userAddress').value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+        });
+
+        // Add to order logic
+        window.addFood = (item) => {
+            const area = document.getElementById('foodDetails');
+            area.value += (area.value ? ", " : "") + item;
+        };
+    </script>
+</body>
+</html>
