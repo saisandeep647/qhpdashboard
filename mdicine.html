@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Order - QHP</title>
+    <style>
+        :root { --primary: #2962ff; --bg: #f4f7fb; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; height: 100vh; background: #fff; padding: 25px; position: fixed; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .logo { font-size:26px; font-weight:800; color:#0D47A1; margin-bottom:40px; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; }
+        .sidebar li a { text-decoration: none; color: #333; display: flex; align-items: center; gap: 10px; }
+        .sidebar li.active { background: #eaf2ff; color: var(--primary); font-weight: 600; }
+        
+        /* Main Content */
+        .main { margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
+        .medicine-header { background: var(--primary); color: white; padding: 30px; border-radius: 20px; margin-bottom: 30px; }
+        .grid-med { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .med-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
+        
+        .upload-section { background: white; padding: 30px; border-radius: 20px; border: 2px dashed var(--primary); text-align: center; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">QHP <span>Partner</span></div>
+        <ul>
+            <li><a href="userdashboard.html">🏠 Dashboard</a></li>
+            <li><a href="food.html">🍔 Order Food</a></li>
+            <li class="active">💊 Medicine Order</li>
+            <li>🛒 Grocery</li>
+            <li>📦 Parcel Booking</li>
+            <li>📍 Track Order</li>
+            <li>💳 Wallet</li>
+            <li>👤 Profile</li>
+            <li>⚙ Settings</li>
+        </ul>
+    </aside>
+
+    <main class="main">
+        <div class="medicine-header">
+            <h1>💊 Order Medicines</h1>
+            <p>Upload your prescription or search for essentials</p>
+        </div>
+
+        <input type="text" placeholder="Search for medicine..." style="width:100%; padding:15px; border-radius:12px; border:none; margin-bottom:30px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+
+        <div class="grid-med">
+            <div class="med-card"><h3>🩹 General</h3><p>Pain & Fever</p></div>
+            <div class="med-card"><h3>🍃 Ayurvedic</h3><p>Natural Care</p></div>
+            <div class="med-card"><h3>🍼 Baby Care</h3><p>Essentials</p></div>
+            <div class="med-card"><h3>🧼 Wellness</h3><p>Personal Care</p></div>
+        </div>
+
+        <section class="upload-section">
+            <h3>Upload Prescription</h3>
+            <p>Get your order reviewed by a licensed pharmacist</p>
+            <input type="file" id="prescription" style="margin: 20px 0;">
+            <br>
+            <button onclick="alert('Prescription Uploaded Successfully!')">Submit Prescription</button>
+        </section>
+    </main>
+
+</body>
+</html>
