@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QHP Dashboard</title>
-
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
         body { background:#f4f7fb; display:flex; }
@@ -22,7 +21,10 @@
         .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px; margin-bottom:30px; }
         .card { color:#fff; padding:25px; border-radius:20px; transition:.3s; cursor:pointer; }
         .card:hover { transform:translateY(-5px); }
-        .food { background:#FF9800; } .medicine { background:#2962ff; } .grocery { background:#ff6d00; } .parcel { background:#9c27b0; }
+        .food { background:#FF9800; } 
+        .medicine { background:#2962ff; } 
+        .grocery { background:#ff6d00; } 
+        .parcel { background:#9c27b0; }
         .card h2 { font-size:22px; margin-bottom:10px; }
         .card p { opacity:.9; }
         .orders { background:#fff; padding:20px; border-radius:18px; box-shadow:0 5px 15px rgba(0,0,0,.08); }
@@ -31,9 +33,7 @@
         @media(max-width:768px) { body { flex-direction:column; } .sidebar { width:100%; height:auto; } }
     </style>
 </head>
-
 <body>
-
     <div class="sidebar">
         <div class="logo">QHP <span>Partner</span></div>
         <ul>
@@ -42,10 +42,10 @@
             <li><a href="https://saisandeep647.github.io/qhpdashboard/medicine">💊 Medicine Order</a></li>
             <li><a href="https://saisandeep647.github.io/qhpdashboard/grocery">🛒 Grocery</a></li>
             <li><a href="https://saisandeep647.github.io/qhpdashboard/parcel">📦 Parcel Booking</a></li>
-            <li><a href="">📍 Track Order</a></li>
-            <li><a href="wallet.html">💳 Wallet</a></li>
-            <li><a href="profile.html">👤 Profile</a></li>
-            <li><a href="settings.html">⚙ Settings</a></li>
+            <li><a href="#" onclick="alert('Track Order Feature Coming Soon!')">📍 Track Order</a></li>
+            <li><a href="#" onclick="alert('Wallet Coming Soon!')">💳 Wallet</a></li>
+            <li><a href="#" onclick="alert('Profile Coming Soon!')">👤 Profile</a></li>
+            <li><a href="#" onclick="alert('Settings Coming Soon!')">⚙ Settings</a></li>
         </ul>
     </div>
 
@@ -62,38 +62,43 @@
         </div>
 
         <div class="cards">
-            <a href="food.html" style="text-decoration:none;"><div class="card food"><h2>🍔 Order Food</h2><p>Restaurants near you</p></div></a>
-            <a href="medicine.html" style="text-decoration:none;"><div class="card medicine"><h2>💊 Medicines</h2><p>Delivery in 20 mins</p></div></a>
-            <a href="grocery.html" style="text-decoration:none;"><div class="card grocery"><h2>🛒 Grocery</h2><p>Fresh Daily Needs</p></div></a>
-            <a href="parcel.html" style="text-decoration:none;"><div class="card parcel"><h2>📦 Parcel</h2><p>Send Anywhere</p></div></a>
+            <div class="card food" onclick="alert('Food Ordering Coming Soon!')">
+                <h2>🍔 Order Food</h2>
+                <p>Restaurants near you</p>
+            </div>
+            <div class="card medicine" onclick="alert('Medicine Ordering Coming Soon!')">
+                <h2>💊 Medicines</h2>
+                <p>Delivery in 20 mins</p>
+            </div>
+            <div class="card grocery" onclick="openGrocery()">
+                <h2>🛒 Grocery</h2>
+                <p>Fresh Daily Needs</p>
+            </div>
+            <div class="card parcel" onclick="alert('Parcel Booking Coming Soon!')">
+                <h2>📦 Parcel</h2>
+                <p>Send Anywhere</p>
+            </div>
         </div>
 
         <div class="orders">
             <h2>Recent Orders</h2>
-            <div class="order"><div><b>#QHP7842</b><br>Medicines & Grocery</div><div>₹428<span class="badge">Delivered</span></div></div>
-            <div class="order"><div><b>#QHP7843</b><br>Food Order</div><div>₹299<span class="badge">Delivered</span></div></div>
-            <div class="order"><div><b>#QHP7844</b><br>Parcel Booking</div><div>₹150<span class="badge">In Transit</span></div></div>
+            <div class="order">
+                <div><b>#QHP7842</b><br>Medicines & Grocery</div>
+                <div>₹428 <span class="badge">Delivered</span></div>
+            </div>
+            <div class="order">
+                <div><b>#QHP7843</b><br>Food Order</div>
+                <div>₹299 <span class="badge">Delivered</span></div>
+            </div>
+            <div class="order">
+                <div><b>#QHP7844</b><br>Parcel Booking</div>
+                <div>₹150 <span class="badge">In Transit</span></div>
+            </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAsCDXYRerEZn_5--6f8ta1BAD-hIv1PiI",
-            authDomain: "qhp2026-d510b.firebaseapp.com",
-            databaseURL: "https://qhp2026-d510b-default-rtdb.firebaseio.com",
-            projectId: "qhp2026-d510b",
-            storageBucket: "qhp2026-d510b.firebasestorage.app",
-            messagingSenderId: "127037647697",
-            appId: "1:127037647697:web:aac47af8ec8a04616b4170",
-            measurementId: "G-BJPKMHE7JC"
-        };
-        initializeApp(firebaseConfig);
-    </script>
-
     <script>
+        // Greeting
         function setGreeting() {
             const hour = new Date().getHours();
             const greetingElement = document.getElementById('greeting');
@@ -102,6 +107,11 @@
             else greetingElement.innerText = "Good Evening, Rahul 👋";
         }
         setGreeting();
+
+        // Open Grocery Selector
+        function openGrocery() {
+            window.open('grocery_selector.html', '_blank');
+        }
     </script>
 </body>
 </html>
