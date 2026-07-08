@@ -6,85 +6,688 @@
     <title>QHP | Food Order</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --primary: #0D47A1; --accent: #FF9800; --bg: #f4f7fb; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); display: flex; min-height: 100vh; }
+        :root { 
+            --primary: #0D47A1; 
+            --accent: #FF9800; 
+            --bg: #f4f7fb;
+            --success: #4CAF50;
+            --warning: #FFC107;
+        }
         
-        /* Sidebar Styling */
-        .sidebar { width: 260px; background: #fff; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
-        .logo { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 40px; }
-        .sidebar ul { list-style: none; }
-        .sidebar li { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-        .sidebar li a { text-decoration: none; color: #333; display: flex; align-items: center; gap: 12px; }
-        .active-page { background: var(--primary); color: white; border-radius: 12px; }
-        .active-page a { color: white !important; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        
+        body { 
+            background: var(--bg); 
+            display: flex; 
+            min-height: 100vh; 
+        }
+        
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            padding: 15px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+        
+        /* Sidebar Styling - WHITE BACKGROUND */
+        .sidebar { 
+            width: 260px; 
+            background: #ffffff;
+            padding: 25px; 
+            box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+            position: relative;
+            transition: 0.3s ease;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-close {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: var(--primary); 
+            margin-bottom: 40px; 
+            margin-top: 20px;
+        }
+        
+        .logo span { 
+            color: var(--accent); 
+        }
+        
+        .sidebar ul { 
+            list-style: none; 
+        }
+        
+        .sidebar li { 
+            padding: 14px 15px; 
+            margin-bottom: 8px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            transition: 0.3s;
+            background: #f5f5f5;
+        }
+        
+        .sidebar li a { 
+            text-decoration: none; 
+            color: #333; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            font-size: 15px;
+        }
+        
+        .sidebar li:hover {
+            background: #e8e8e8;
+            transform: translateX(5px);
+        }
+        
+        .active-page { 
+            background: var(--primary) !important; 
+        }
+        
+        .active-page a { 
+            color: white !important; 
+        }
 
         /* Main Content */
-        .main { flex: 1; padding: 40px; display: flex; justify-content: center; }
-        .form-card { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 650px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .pill-container { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .pill { padding: 8px 16px; background: #f0f4ff; border-radius: 20px; cursor: pointer; color: var(--primary); font-size: 14px; border: 1px solid var(--primary); }
-        .pill:hover { background: var(--primary); color: white; }
+        .main { 
+            flex: 1; 
+            padding: 40px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            transition: 0.3s;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
         
-        input, textarea { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; }
-        #map { height: 200px; border-radius: 15px; margin-bottom: 15px; border: 2px solid #eee; }
-        .submit-btn { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .form-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            width: 100%; 
+            max-width: 600px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
+            margin-bottom: 20px;
+        }
+        
+        .form-card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .form-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        /* Location Box */
+        .location-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary);
+        }
+        
+        .location-box p {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        /* Status Boxes */
+        .status-box { 
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border-left: 5px solid var(--primary);
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 15px;
+        }
+        
+        .status-box.success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+        
+        .status-box.warning {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left-color: var(--warning);
+            color: #E65100;
+        }
+        
+        /* Agent Card */
+        .agent-card { 
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 2px solid var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .agent-card p {
+            margin: 12px 0;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .agent-card strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .agent-card span {
+            color: #E65100;
+            font-weight: 600;
+        }
+        
+        /* Order Details Box */
+        .order-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .order-details p {
+            margin: 10px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .order-details strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Form Inputs */
+        input, textarea { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            margin-bottom: 15px;
+            font-size: 14px;
+            transition: 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(13, 71, 161, 0.2);
+        }
+        
+        input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+            color: #666;
+        }
+        
+        /* Buttons */
+        .submit-btn, .get-location-btn { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .submit-btn:hover, .get-location-btn:hover {
+            background: #0D3A8F;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(13, 71, 161, 0.3);
+        }
+        
+        .submit-btn:active, .get-location-btn:active {
+            transform: translateY(0);
+        }
+        
+        .secondary-btn {
+            width: 100%;
+            padding: 12px;
+            background: #999;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        .secondary-btn:hover {
+            background: #777;
+            transform: translateY(-2px);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(13, 71, 161, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .badge.pending {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .badge.approved {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge.assigned {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                z-index: 999;
+                width: 240px;
+                border-radius: 0;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .main {
+                padding: 80px 15px 40px 15px;
+                margin-left: 0;
+            }
+            
+            .form-card {
+                max-width: 100%;
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <span class="sidebar-close" id="sidebarClose">&times;</span>
         <div class="logo">QHP <span>Partner</span></div>
         <ul>
-            <li><a href="https://saisandeep647.github.io/qhpdashboard/dashboard">🏠 Dashboard</a></li>
-            <li class="active-page"><a href="food.html">🍔 Order Food</a></li>
+            <li><a href="userdashboard.html">🏠 Dashboard</a></li>
+            <li class="active-page"><a href="#">🍔 Order Food</a></li>
             <li><a href="medicine.html">💊 Medicine Order</a></li>
-            <li><a href="#">🛒 Grocery</a></li>
-            <li><a href="#">📦 Parcel Booking</a></li>
+            <li><a href="grocery.html">🛒 Grocery</a></li>
+            <li><a href="parcel.html">📦 Parcel Booking</a></li>
             <li><a href="#">📍 Track Order</a></li>
-            <li><a href="#">💳 Wallet</a></li>
-            <li><a href="#">👤 Profile</a></li>
-            <li><a href="#">⚙ Settings</a></li>
         </ul>
     </div>
 
     <div class="main">
-        <div class="form-card">
-            <h2>Request Food</h2>
-            <label>Quick Selection:</label>
-            <div class="pill-container">
-                <span class="pill" onclick="addFood('Pizza')">🍕 Pizza</span>
-                <span class="pill" onclick="addFood('Biryani')">🥘 Biryani</span>
-                <span class="pill" onclick="addFood('Burger')">🍔 Burger</span>
-                <span class="pill" onclick="addFood('Ice Cream')">🍦 Ice Cream</span>
-            </div>
-
-            <input type="text" id="userName" placeholder="Your Full Name">
-            <div id="map"></div>
-            <input type="text" id="userAddress" placeholder="Location Coordinates" readonly>
-            <textarea id="foodDetails" placeholder="Detailed order (e.g. 2x Veg Pizza, No onions)" rows="3"></textarea>
+        <!-- 1. Order Form -->
+        <div class="form-card" id="orderForm">
+            <h2>🍔 Request Food Order</h2>
             
-            <button class="submit-btn" id="postBtn">Post Request</button>
+            <div class="location-box">
+                <p>📍 Your Location:</p>
+                <input type="text" id="userAddress" placeholder="Getting your address..." readonly>
+                <input type="text" id="coordinates" placeholder="Coordinates: Latitude, Longitude" readonly style="font-size: 12px; background: #e3f2fd;">
+                <button class="get-location-btn" onclick="getUserLocation()">📍 Get My Current Location</button>
+            </div>
+            
+            <input type="text" id="userName" placeholder="Your Full Name" required>
+            <input type="tel" id="userPhone" placeholder="Your Phone Number (10 digits)" required>
+            <textarea id="foodDetails" placeholder="Describe your food order in detail..." rows="4"></textarea>
+            
+            <button class="submit-btn" onclick="submitOrder()">📤 Post Food Request</button>
+            <button class="secondary-btn" onclick="resetForm()">🔄 Clear Form</button>
+        </div>
+
+        <!-- 2. Waiting for Delivery Agent Approval -->
+        <div class="form-card" id="waitingAgentSection" style="display:none;">
+            <h3>⏳ Waiting for Delivery Agent</h3>
+            <div class="status-box warning">
+                🕐 Finding nearest delivery agent in your area...
+            </div>
+            <div class="order-details">
+                <p><strong>Order ID:</strong> <span id="orderId">#ORD-001</span></p>
+                <p><strong>Name:</strong> <span id="displayName">-</span></p>
+                <p><strong>Phone:</strong> <span id="displayPhone">-</span></p>
+                <p><strong>Location:</strong> <span id="displayAddress">-</span></p>
+                <p><strong>Order Details:</strong> <span id="displayFood">-</span></p>
+                <span class="badge pending">⏳ WAITING FOR AGENT</span>
+            </div>
+            <div class="spinner"></div>
+        </div>
+
+        <!-- 3. Delivery Agent Assigned & Confirmed -->
+        <div class="form-card" id="agentSection" style="display:none;">
+            <h3>✅ Order Confirmed</h3>
+            <div class="status-box success">
+                ✅ Delivery Agent Assigned! Your order is confirmed.
+            </div>
+            
+            <div class="order-details">
+                <p><strong>Order ID:</strong> <span id="orderId2">#ORD-001</span></p>
+                <p><strong>Status:</strong> <span style="color: var(--success); font-weight: bold;">Out for Delivery</span></p>
+                <p><strong>Estimated Delivery:</strong> <span id="estimatedTime">30-40 mins</span></p>
+                <span class="badge assigned">🚚 IN DELIVERY</span>
+            </div>
+            
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">👤 Delivery Agent Details</h3>
+            <div class="agent-card">
+                <p><strong>👨 Agent Name:</strong> <span id="agentName">Rahul Kumar</span></p>
+                <p><strong>📞 Phone:</strong> <span id="agentPhone">+91 98765 43210</span></p>
+                <p><strong>⭐ Rating:</strong> <span id="agentRating">4.8/5.0</span></p>
+                <p><strong>🚗 Vehicle:</strong> <span id="agentVehicle">Two Wheeler - HR26AB1234</span></p>
+                <p><strong>📍 Current Location:</strong> <span id="agentLoc">Near your area (2 km away)</span></p>
+                <p><strong>🏘️ Service Zone:</strong> <span id="agentZone">East Delhi Area</span></p>
+            </div>
+            
+            <button class="secondary-btn" onclick="trackDelivery()">🗺️ Track on Map</button>
+            <button class="submit-btn" onclick="callAgent()">📞 Call Delivery Agent</button>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize Map
-        const map = L.map('map').setView([17.0005, 81.7807], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        const marker = L.marker([17.0005, 81.7807], {draggable: true}).addTo(map);
-        
-        marker.on('dragend', () => {
-            const pos = marker.getLatLng();
-            document.getElementById('userAddress').value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+        // Initialize variables
+        let userLat, userLon;
+        let currentOrderId;
+
+        // Hamburger Menu Toggle
+        document.getElementById('hamburger').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.getElementById('sidebar').classList.toggle('active');
         });
 
-        // Add to order logic
-        window.addFood = (item) => {
-            const area = document.getElementById('foodDetails');
-            area.value += (area.value ? ", " : "") + item;
-        };
+        document.getElementById('sidebarClose').addEventListener('click', function() {
+            document.getElementById('hamburger').classList.remove('active');
+            document.getElementById('sidebar').classList.remove('active');
+        });
+
+        // Close sidebar when clicking a link
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+        });
+
+        // Get User Location
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLat = position.coords.latitude;
+                        userLon = position.coords.longitude;
+                        
+                        document.getElementById('coordinates').value = 
+                            `📍 ${userLat.toFixed(6)}, ${userLon.toFixed(6)}`;
+                        
+                        // Mock reverse geocoding
+                        const addresses = [
+                            "123 MG Road, Connaught Place, New Delhi, 110001",
+                            "456 Rajpath, Central Delhi, New Delhi, 110001",
+                            "789 South Extension, South Delhi, New Delhi, 110003",
+                            "321 Khan Market, East Delhi, New Delhi, 110003",
+                            "654 Saket, South Delhi, New Delhi, 110017",
+                            "111 Greater Kailash, South Delhi, New Delhi, 110048"
+                        ];
+                        const randomAddr = addresses[Math.floor(Math.random() * addresses.length)];
+                        document.getElementById('userAddress').value = randomAddr;
+                        
+                        alert('✅ Location captured successfully!');
+                    }, 
+                    function(error) {
+                        console.log(error);
+                        alert('⚠️ Could not get location. Please enable location services.');
+                        // Set default location for demo
+                        document.getElementById('userAddress').value = 'New Delhi, India';
+                        document.getElementById('coordinates').value = '📍 28.6139, 77.2090';
+                    }
+                );
+            } else {
+                alert('❌ Geolocation is not supported by your browser.');
+            }
+        }
+
+        // Submit Order
+        function submitOrder() {
+            const userName = document.getElementById('userName').value.trim();
+            const userPhone = document.getElementById('userPhone').value.trim();
+            const userAddress = document.getElementById('userAddress').value.trim();
+            const foodDetails = document.getElementById('foodDetails').value.trim();
+
+            // Validation
+            if (!userName) {
+                alert('❌ Please enter your name!');
+                document.getElementById('userName').focus();
+                return;
+            }
+            
+            if (!userPhone) {
+                alert('❌ Please enter your phone number!');
+                document.getElementById('userPhone').focus();
+                return;
+            }
+            
+            if (userPhone.length !== 10 || isNaN(userPhone)) {
+                alert('❌ Please enter a valid 10-digit phone number!');
+                document.getElementById('userPhone').focus();
+                return;
+            }
+            
+            if (!userAddress || userAddress === 'Getting your address...') {
+                alert('❌ Please get your location first!');
+                return;
+            }
+            
+            if (!foodDetails) {
+                alert('❌ Please describe your food order!');
+                document.getElementById('foodDetails').focus();
+                return;
+            }
+
+            // Generate Order ID
+            currentOrderId = '#ORD-' + Math.floor(Math.random() * 900000 + 100000);
+
+            // Hide form and show waiting agent section
+            document.getElementById('orderForm').style.display = 'none';
+            document.getElementById('waitingAgentSection').style.display = 'block';
+
+            // Display order details
+            document.getElementById('orderId').textContent = currentOrderId;
+            document.getElementById('displayName').textContent = userName;
+            document.getElementById('displayPhone').textContent = userPhone;
+            document.getElementById('displayAddress').textContent = userAddress;
+            document.getElementById('displayFood').textContent = foodDetails;
+
+            // Simulate Delivery Agent Assignment (3-5 seconds)
+            setTimeout(() => {
+                assignDeliveryAgent();
+            }, 3500);
+        }
+
+        // Assign Delivery Agent
+        function assignDeliveryAgent() {
+            const agents = [
+                {
+                    name: "Rahul Kumar",
+                    phone: "+91 98765 43210",
+                    rating: "4.8",
+                    vehicle: "Two Wheeler - HR26AB1234",
+                    location: "Near your area (2 km away)",
+                    zone: "East Delhi Area",
+                    time: "30-40 mins"
+                },
+                {
+                    name: "Priya Singh",
+                    phone: "+91 87654 32109",
+                    rating: "4.9",
+                    vehicle: "Two Wheeler - HR26AB5678",
+                    location: "3 km from your location",
+                    zone: "South Delhi Area",
+                    time: "25-35 mins"
+                },
+                {
+                    name: "Arjun Patel",
+                    phone: "+91 76543 21098",
+                    rating: "4.7",
+                    vehicle: "Two Wheeler - HR26AB9012",
+                    location: "1.5 km from your location",
+                    zone: "Central Delhi Area",
+                    time: "20-30 mins"
+                },
+                {
+                    name: "Sneha Gupta",
+                    phone: "+91 98765 12345",
+                    rating: "4.6",
+                    vehicle: "Two Wheeler - HR26AB3456",
+                    location: "4 km from your location",
+                    zone: "North Delhi Area",
+                    time: "40-50 mins"
+                }
+            ];
+
+            const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+
+            // Hide waiting section and show agent section
+            document.getElementById('waitingAgentSection').style.display = 'none';
+            document.getElementById('agentSection').style.display = 'block';
+
+            // Populate agent details
+            document.getElementById('orderId2').textContent = currentOrderId;
+            document.getElementById('agentName').textContent = randomAgent.name;
+            document.getElementById('agentPhone').textContent = randomAgent.phone;
+            document.getElementById('agentRating').textContent = randomAgent.rating + '/5.0';
+            document.getElementById('agentVehicle').textContent = randomAgent.vehicle;
+            document.getElementById('agentLoc').textContent = randomAgent.location;
+            document.getElementById('agentZone').textContent = randomAgent.zone;
+            document.getElementById('estimatedTime').textContent = randomAgent.time;
+        }
+
+        // Track Delivery
+        function trackDelivery() {
+            alert('🗺️ Opening live tracking map...\n\nIn a real app, this would show your delivery agent on a live map.');
+        }
+
+        // Call Agent
+        function callAgent() {
+            const agentPhone = document.getElementById('agentPhone').textContent;
+            alert('📞 Calling ' + agentPhone + '...\n\nIn a real app, this would initiate a call.');
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('userName').value = '';
+            document.getElementById('userPhone').value = '';
+            document.getElementById('foodDetails').value = '';
+            document.getElementById('orderForm').style.display = 'block';
+            document.getElementById('waitingAgentSection').style.display = 'none';
+            document.getElementById('agentSection').style.display = 'none';
+        }
+
+        // Auto-get location on page load
+        window.addEventListener('load', getUserLocation);
     </script>
 </body>
 </html>
