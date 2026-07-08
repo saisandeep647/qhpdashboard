@@ -5,104 +5,746 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QHP | Parcel Booking</title>
     <style>
-        :root { --primary: #0D47A1; --accent: #9c27b0; --bg: #f4f7fb; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); display: flex; min-height: 100vh; }
+        :root { 
+            --primary: #0D47A1; 
+            --accent: #9c27b0; 
+            --bg: #f4f7fb;
+            --success: #4CAF50;
+            --warning: #FFC107;
+        }
         
-        /* Sidebar Navigation */
-        .sidebar { width: 260px; background: #fff; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
-        .logo { font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 40px; }
-        .sidebar ul { list-style: none; }
-        .sidebar li { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-        .sidebar li a { text-decoration: none; color: #333; display: flex; align-items: center; gap: 12px; }
-        .active-page { background: var(--accent); color: white; border-radius: 12px; }
-        .active-page a { color: white !important; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        
+        body { 
+            background: var(--bg); 
+            display: flex; 
+            min-height: 100vh; 
+        }
+        
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            padding: 15px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+        
+        /* Sidebar Navigation - WHITE BACKGROUND */
+        .sidebar { 
+            width: 260px; 
+            background: #ffffff; 
+            padding: 25px; 
+            box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+            position: relative;
+            transition: 0.3s ease;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-close {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: var(--primary); 
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+        
+        .logo span { 
+            color: var(--accent); 
+        }
+        
+        .sidebar ul { 
+            list-style: none; 
+        }
+        
+        .sidebar li { 
+            padding: 14px 15px; 
+            margin-bottom: 8px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: 0.3s;
+            background: #f5f5f5;
+        }
+        
+        .sidebar li a { 
+            text-decoration: none; 
+            color: #333; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            font-size: 15px;
+        }
+        
+        .sidebar li:hover {
+            background: #e8e8e8;
+            transform: translateX(5px);
+        }
+        
+        .active-page { 
+            background: var(--accent) !important; 
+            color: white !important;
+        }
+        
+        .active-page a { 
+            color: white !important; 
+        }
 
         /* Main Content */
-        .main { flex: 1; padding: 40px; display: flex; justify-content: center; align-items: flex-start; }
-        .booking-box { background: white; padding: 40px; border-radius: 25px; width: 100%; max-width: 600px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .main { 
+            flex: 1; 
+            padding: 40px 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
         
-        h2 { color: var(--accent); margin-bottom: 25px; }
-        .size-selection { display: flex; gap: 15px; margin-bottom: 20px; }
-        .size-card { flex: 1; padding: 20px; border: 2px solid #eee; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .size-card.selected { border-color: var(--accent); background: #fdf7fe; }
+        .booking-box { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            width: 100%; 
+            max-width: 600px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
+        }
         
-        label { font-weight: bold; display: block; margin-top: 15px; color: #333; }
-        input { width:100%; padding: 15px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; }
-        .submit-btn { width:100%; padding: 18px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; }
+        h2 { 
+            color: var(--accent); 
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        
+        h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        /* Location Box */
+        .location-box {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--accent);
+        }
+        
+        .location-box p {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        /* Size Selection */
+        .size-selection { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        
+        .size-card { 
+            flex: 1; 
+            padding: 20px; 
+            border: 2px solid #eee; 
+            border-radius: 12px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.3s;
+            background: #f9f9f9;
+        }
+        
+        .size-card h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .size-card small {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .size-card.selected { 
+            border-color: var(--accent); 
+            background: #fdf7fe;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
+        }
+        
+        /* Status Box */
+        .status-box { 
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border-left: 5px solid var(--accent);
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 15px;
+        }
+        
+        .status-box.success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+        
+        .status-box.warning {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left-color: var(--warning);
+            color: #E65100;
+        }
+        
+        /* Delivery Details Box */
+        .delivery-card { 
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 2px solid var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .delivery-card p {
+            margin: 12px 0;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .delivery-card strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .delivery-card span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Order Details Box */
+        .order-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .order-details p {
+            margin: 10px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .order-details strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Form Labels & Inputs */
+        label { 
+            font-weight: bold; 
+            display: block; 
+            margin-top: 15px; 
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        input, textarea { 
+            width: 100%; 
+            padding: 12px 15px; 
+            margin-top: 8px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Segoe UI', sans-serif;
+            transition: 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(156, 39, 176, 0.2);
+        }
+        
+        input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+            color: #666;
+        }
+        
+        /* Buttons */
+        .submit-btn, .get-location-btn { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .submit-btn:hover, .get-location-btn:hover {
+            background: #8B1A8B;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(156, 39, 176, 0.3);
+        }
+        
+        .submit-btn:active, .get-location-btn:active {
+            transform: translateY(0);
+        }
+        
+        .secondary-btn {
+            width: 100%;
+            padding: 12px;
+            background: #999;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        .secondary-btn:hover {
+            background: #777;
+            transform: translateY(-2px);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(156, 39, 176, 0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .badge.pending {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .badge.approved {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge.assigned {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                z-index: 999;
+                width: 240px;
+                border-radius: 0;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .main {
+                padding: 80px 15px 40px 15px;
+                margin-left: 0;
+            }
+            
+            .booking-box {
+                max-width: 100%;
+                padding: 20px;
+            }
+            
+            .size-selection {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <span class="sidebar-close" id="sidebarClose">&times;</span>
         <div class="logo">QHP <span>Partner</span></div>
         <ul>
-            <li><a href="https://saisandeep647.github.io/qhpdashboard/dashboard">🏠 Dashboard</a></li>
-            <li><a href="food.html">🍔 Order Food</a></li>
-            <li><a href="medicine.html">💊 Medicine Order</a></li>
+            <li><a href="userdashboard.html">🏠 Dashboard</a></li>
+            <li><a href="#">🍔 Order Food</a></li>
+            <li><a href="#">💊 Medicine Order</a></li>
             <li><a href="#">🛒 Grocery</a></li>
-            <li class="active-page"><a href="parcel.html">📦 Parcel Booking</a></li>
+            <li class="active-page"><a href="#">📦 Parcel Booking</a></li>
             <li><a href="#">📍 Track Order</a></li>
             <li><a href="#">💳 Wallet</a></li>
             <li><a href="#">👤 Profile</a></li>
-            <li><a href="#">⚙ Settings</a></li>
+            <li><a href="#">⚙️ Settings</a></li>
         </ul>
     </div>
 
     <div class="main">
-        <div class="booking-box">
+        <!-- 1. Parcel Booking Form -->
+        <div class="booking-box" id="bookingForm">
             <h2>📦 Book a Parcel Delivery</h2>
             
             <label>Select Vehicle Option:</label>
             <div class="size-selection">
                 <div class="size-card" id="smallCard" onclick="selectSize('Small')">
-                    <h4>🛵 Small</h4><small>2-Wheeler</small>
+                    <h4>🛵 Small</h4>
+                    <small>2-Wheeler</small>
                 </div>
                 <div class="size-card" id="largeCard" onclick="selectSize('Large')">
-                    <h4>🛺 Large</h4><small>3/4-Wheeler</small>
+                    <h4>🛺 Large</h4>
+                    <small>3/4-Wheeler</small>
                 </div>
             </div>
 
-            <label>Pickup Point:</label>
-            <input type="text" id="pickupPoint" placeholder="Enter pickup address">
+            <div class="location-box">
+                <p>📍 Pickup Location:</p>
+                <input type="text" id="pickupPoint" placeholder="Enter pickup address">
+                <input type="text" id="pickupCoordinates" placeholder="Coordinates: Latitude, Longitude" readonly style="font-size: 12px; background: #f3e5f5;">
+            </div>
 
-            <label>Drop Point:</label>
+            <label>📍 Drop-off Location:</label>
             <input type="text" id="dropPoint" placeholder="Enter drop-off address">
 
-            <button class="submit-btn" id="sendRequestBtn">Send Parcel Request</button>
+            <label>📝 Parcel Details:</label>
+            <textarea id="parcelDetails" placeholder="Describe your parcel (contents, weight, etc.)" rows="3"></textarea>
+
+            <button class="get-location-btn" onclick="getPickupLocation()">📍 Set Pickup Location</button>
+            <button class="submit-btn" onclick="sendParcelRequest()">📤 Send Parcel Request</button>
+            <button class="secondary-btn" onclick="resetParcelForm()">🔄 Clear Form</button>
+        </div>
+
+        <!-- 2. Waiting for Delivery Partner -->
+        <div class="booking-box" id="waitingSection" style="display:none;">
+            <h3>⏳ Waiting for Delivery Partner</h3>
+            <div class="status-box warning">
+                🕐 Finding nearest delivery partner in your area...
+            </div>
+            <div class="order-details">
+                <p><strong>Booking ID:</strong> <span id="bookingId">#PRCEL-001</span></p>
+                <p><strong>Vehicle Type:</strong> <span id="displayVehicle">-</span></p>
+                <p><strong>Pickup:</strong> <span id="displayPickup">-</span></p>
+                <p><strong>Drop-off:</strong> <span id="displayDrop">-</span></p>
+                <p><strong>Parcel Details:</strong> <span id="displayParcel">-</span></p>
+                <span class="badge pending">⏳ WAITING FOR PARTNER</span>
+            </div>
+            <div class="spinner"></div>
+        </div>
+
+        <!-- 3. Delivery Partner Assigned -->
+        <div class="booking-box" id="partnerSection" style="display:none;">
+            <h3>✅ Delivery Partner Assigned</h3>
+            <div class="status-box success">
+                ✅ Delivery Partner Found! Your parcel is confirmed.
+            </div>
+            
+            <div class="order-details">
+                <p><strong>Booking ID:</strong> <span id="bookingId2">#PRCEL-001</span></p>
+                <p><strong>Status:</strong> <span style="color: var(--success); font-weight: bold;">Partner En Route</span></p>
+                <p><strong>Estimated Pickup:</strong> <span id="estimatedPickup">15-20 mins</span></p>
+                <span class="badge assigned">🚗 CONFIRMED</span>
+            </div>
+            
+            <h3 style="margin-top: 25px; margin-bottom: 15px;">👤 Delivery Partner Details</h3>
+            <div class="delivery-card">
+                <p><strong>👨 Partner Name:</strong> <span id="partnerName">Rajesh Singh</span></p>
+                <p><strong>📞 Phone:</strong> <span id="partnerPhone">+91 98765 12345</span></p>
+                <p><strong>⭐ Rating:</strong> <span id="partnerRating">4.9/5.0</span></p>
+                <p><strong>🚗 Vehicle:</strong> <span id="partnerVehicle">Two Wheeler - HR26AB5678</span></p>
+                <p><strong>📍 Current Location:</strong> <span id="partnerLoc">1 km from your pickup point</span></p>
+                <p><strong>🏘️ Service Area:</strong> <span id="partnerZone">Delhi NCR Region</span></p>
+            </div>
+            
+            <button class="secondary-btn" onclick="trackPartner()">🗺️ Track Partner</button>
+            <button class="submit-btn" onclick="callPartner()">📞 Call Delivery Partner</button>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAsCDXYRerEZn_5--6f8ta1BAD-hIv1PiI",
-            databaseURL: "https://qhp2026-d510b-default-rtdb.firebaseio.com",
-            projectId: "qhp2026-d510b"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
+    <script>
         let selectedSize = "Small";
+        let userLat, userLon;
+        let currentBookingId;
+
+        // Hamburger Menu Toggle
+        document.getElementById('hamburger').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        document.getElementById('sidebarClose').addEventListener('click', function() {
+            document.getElementById('hamburger').classList.remove('active');
+            document.getElementById('sidebar').classList.remove('active');
+        });
+
+        // Close sidebar when clicking a link
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+        });
+
+        // Select Vehicle Size
         window.selectSize = (size) => {
             selectedSize = size;
             document.getElementById('smallCard').classList.toggle('selected', size === 'Small');
             document.getElementById('largeCard').classList.toggle('selected', size === 'Large');
         };
-        
-        // Initialize selection
-        window.selectSize("Small");
 
-        document.getElementById('sendRequestBtn').addEventListener('click', () => {
-            push(ref(db, 'parcel_requests/'), {
-                size: selectedSize,
-                pickup: document.getElementById('pickupPoint').value,
-                drop: document.getElementById('dropPoint').value,
-                status: "Pending"
-            }).then(() => alert("Request Posted!"));
-        });
+        // Initialize selection
+        selectSize("Small");
+
+        // Get Pickup Location
+        function getPickupLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLat = position.coords.latitude;
+                        userLon = position.coords.longitude;
+                        
+                        document.getElementById('pickupCoordinates').value = 
+                            `📍 ${userLat.toFixed(6)}, ${userLon.toFixed(6)}`;
+                        
+                        // Mock reverse geocoding
+                        const locations = [
+                            "123 Lajpat Nagar, New Delhi, 110024",
+                            "456 Nehru Place, New Delhi, 110019",
+                            "789 INA Colony, New Delhi, 110023",
+                            "321 Vasant Vihar, New Delhi, 110057",
+                            "654 Safdarjung, New Delhi, 110029"
+                        ];
+                        const randomLoc = locations[Math.floor(Math.random() * locations.length)];
+                        document.getElementById('pickupPoint').value = randomLoc;
+                        
+                        alert('✅ Pickup location captured successfully!');
+                    }, 
+                    function(error) {
+                        console.log(error);
+                        alert('⚠️ Could not get location. Please enable location services.');
+                        document.getElementById('pickupPoint').value = 'New Delhi, India';
+                        document.getElementById('pickupCoordinates').value = '📍 28.6139, 77.2090';
+                    }
+                );
+            } else {
+                alert('❌ Geolocation is not supported by your browser.');
+            }
+        }
+
+        // Send Parcel Request
+        function sendParcelRequest() {
+            const vehicleType = selectedSize;
+            const pickupAddr = document.getElementById('pickupPoint').value.trim();
+            const dropAddr = document.getElementById('dropPoint').value.trim();
+            const parcelDetails = document.getElementById('parcelDetails').value.trim();
+
+            // Validation
+            if (!pickupAddr) {
+                alert('❌ Please enter pickup location!');
+                document.getElementById('pickupPoint').focus();
+                return;
+            }
+            
+            if (!dropAddr) {
+                alert('❌ Please enter drop-off location!');
+                document.getElementById('dropPoint').focus();
+                return;
+            }
+            
+            if (!parcelDetails) {
+                alert('❌ Please describe your parcel!');
+                document.getElementById('parcelDetails').focus();
+                return;
+            }
+
+            // Generate Booking ID
+            currentBookingId = '#PRCEL-' + Math.floor(Math.random() * 900000 + 100000);
+
+            // Hide form and show waiting section
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('waitingSection').style.display = 'block';
+
+            // Display booking details
+            document.getElementById('bookingId').textContent = currentBookingId;
+            document.getElementById('displayVehicle').textContent = vehicleType + ' Vehicle (2-Wheeler)';
+            document.getElementById('displayPickup').textContent = pickupAddr;
+            document.getElementById('displayDrop').textContent = dropAddr;
+            document.getElementById('displayParcel').textContent = parcelDetails;
+
+            // Simulate Partner Assignment (3-5 seconds)
+            setTimeout(() => {
+                assignDeliveryPartner();
+            }, 3500);
+        }
+
+        // Assign Delivery Partner
+        function assignDeliveryPartner() {
+            const partners = [
+                {
+                    name: "Rajesh Singh",
+                    phone: "+91 98765 12345",
+                    rating: "4.9",
+                    vehicle: "Two Wheeler - HR26AB5678",
+                    location: "1 km from your pickup point",
+                    zone: "Delhi NCR Region",
+                    time: "15-20 mins"
+                },
+                {
+                    name: "Amit Kumar",
+                    phone: "+91 87654 54321",
+                    rating: "4.8",
+                    vehicle: "Two Wheeler - HR26AB9012",
+                    location: "2 km from your pickup point",
+                    zone: "Delhi NCR Region",
+                    time: "20-25 mins"
+                },
+                {
+                    name: "Vikram Tiwari",
+                    phone: "+91 76543 98765",
+                    rating: "4.7",
+                    vehicle: "Two Wheeler - HR26AB3456",
+                    location: "0.8 km from your pickup point",
+                    zone: "Delhi NCR Region",
+                    time: "10-15 mins"
+                },
+                {
+                    name: "Deepak Sharma",
+                    phone: "+91 98765 67890",
+                    rating: "4.9",
+                    vehicle: "Two Wheeler - HR26AB7890",
+                    location: "1.5 km from your pickup point",
+                    zone: "Delhi NCR Region",
+                    time: "18-23 mins"
+                }
+            ];
+
+            const randomPartner = partners[Math.floor(Math.random() * partners.length)];
+
+            // Hide waiting section and show partner section
+            document.getElementById('waitingSection').style.display = 'none';
+            document.getElementById('partnerSection').style.display = 'block';
+
+            // Populate partner details
+            document.getElementById('bookingId2').textContent = currentBookingId;
+            document.getElementById('partnerName').textContent = randomPartner.name;
+            document.getElementById('partnerPhone').textContent = randomPartner.phone;
+            document.getElementById('partnerRating').textContent = randomPartner.rating + '/5.0';
+            document.getElementById('partnerVehicle').textContent = randomPartner.vehicle;
+            document.getElementById('partnerLoc').textContent = randomPartner.location;
+            document.getElementById('partnerZone').textContent = randomPartner.zone;
+            document.getElementById('estimatedPickup').textContent = randomPartner.time;
+        }
+
+        // Track Partner
+        function trackPartner() {
+            alert('🗺️ Opening live tracking map...\n\nIn a real app, this would show your delivery partner on a live map.');
+        }
+
+        // Call Partner
+        function callPartner() {
+            const partnerPhone = document.getElementById('partnerPhone').textContent;
+            alert('📞 Calling ' + partnerPhone + '...\n\nIn a real app, this would initiate a call.');
+        }
+
+        // Reset Form
+        function resetParcelForm() {
+            document.getElementById('pickupPoint').value = '';
+            document.getElementById('pickupCoordinates').value = '';
+            document.getElementById('dropPoint').value = '';
+            document.getElementById('parcelDetails').value = '';
+            document.getElementById('bookingForm').style.display = 'block';
+            document.getElementById('waitingSection').style.display = 'none';
+            document.getElementById('partnerSection').style.display = 'none';
+            selectSize("Small");
+        }
     </script>
 </body>
 </html>
