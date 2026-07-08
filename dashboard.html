@@ -16,7 +16,7 @@
         .sidebar a { text-decoration: none; color: inherit; display: block; }
         .main { flex:1; padding:25px; }
         .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
-        .profile { display:flex; align-items:center; gap:10px; }
+        .profile { display:flex; align-items:center; gap:10px; cursor:pointer; }
         .profile img { width:45px; height:45px; border-radius:50%; }
         .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px; margin-bottom:30px; }
         .card { color:#fff; padding:25px; border-radius:20px; transition:.3s; cursor:pointer; }
@@ -30,6 +30,35 @@
         .orders { background:#fff; padding:20px; border-radius:18px; box-shadow:0 5px 15px rgba(0,0,0,.08); }
         .order { display:flex; justify-content:space-between; align-items:center; padding:18px 0; border-bottom:1px solid #eee; }
         .badge { background:#dff5e5; color:green; padding:6px 12px; border-radius:20px; font-size:14px; }
+        
+        /* Modal Styles */
+        .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); }
+        .modal.show { display:flex; align-items:center; justify-content:center; }
+        .modal-content { background-color:#fff; padding:30px; border-radius:15px; width:90%; max-width:500px; box-shadow:0 10px 30px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; border-bottom:2px solid #eee; padding-bottom:15px; }
+        .modal-header h2 { color:#0D47A1; font-size:24px; }
+        .close { font-size:28px; font-weight:bold; color:#aaa; cursor:pointer; transition:.3s; }
+        .close:hover { color:#000; }
+        
+        .form-group { margin-bottom:20px; }
+        .form-group label { display:block; margin-bottom:8px; color:#333; font-weight:bold; font-size:14px; }
+        .form-group input, .form-group select { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
+        .form-group input:focus, .form-group select:focus { outline:none; border-color:#0D47A1; box-shadow:0 0 5px rgba(13,71,161,0.3); }
+        
+        .button-group { display:flex; gap:10px; margin-top:25px; }
+        .btn { padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:bold; transition:.3s; }
+        .btn-primary { background:#0D47A1; color:#fff; flex:1; }
+        .btn-primary:hover { background:#0B3C8F; }
+        .btn-secondary { background:#f0f0f0; color:#333; flex:1; }
+        .btn-secondary:hover { background:#e0e0e0; }
+        .btn-small { padding:8px 16px; font-size:13px; }
+        
+        .map-container { width:100%; height:300px; background:#e0e0e0; border-radius:8px; margin-bottom:20px; position:relative; }
+        .map-container img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
+        
+        .info-text { color:#666; font-size:13px; margin-bottom:15px; }
+        .verified-status { color:#d32f2f; font-size:13px; margin-top:10px; }
+        
         @media(max-width:768px) { body { flex-direction:column; } .sidebar { width:100%; height:auto; } }
     </style>
 </head>
@@ -42,10 +71,10 @@
             <li><a href="https://saisandeep647.github.io/qhpdashboard/medicine">💊 Medicine Order</a></li>
             <li><a href="https://saisandeep647.github.io/qhpdashboard/grocery">🛒 Grocery</a></li>
             <li><a href="https://saisandeep647.github.io/qhpdashboard/parcel">📦 Parcel Booking</a></li>
-            <li><a href="#" onclick="alert('Track Order Feature Coming Soon!')">📍 Track Order</a></li>
+            <li onclick="openTrackOrder()">📍 Track Order</li>
             <li><a href="#" onclick="alert('Wallet Coming Soon!')">💳 Wallet</a></li>
-            <li><a href="#" onclick="alert('Profile Coming Soon!')">👤 Profile</a></li>
-            <li><a href="#" onclick="alert('Settings Coming Soon!')">⚙ Settings</a></li>
+            <li onclick="openProfile()">👤 Profile</li>
+            <li onclick="openSettings()">⚙ Settings</li>
         </ul>
     </div>
 
@@ -55,30 +84,18 @@
                 <h1 id="greeting">Welcome, Rahul 👋</h1>
                 <p>Welcome back to QHP</p>
             </div>
-            <div class="profile">
+            <div class="profile" onclick="openProfile()">
                 <img src="https://i.pravatar.cc/150?img=3">
                 <div><b>Rahul Sharma</b><br><small>Online</small></div>
             </div>
         </div>
 
-        <div class="cards">
-            <div class="card food" onclick="alert('Food Ordering Coming Soon!')">
-                <h2>🍔 Order Food</h2>
-                <p>Restaurants near you</p>
-            </div>
-            <div class="card medicine" onclick="alert('Medicine Ordering Coming Soon!')">
-                <h2>💊 Medicines</h2>
-                <p>Delivery in 20 mins</p>
-            </div>
-            <div class="card grocery" onclick="openGrocery()">
-                <h2>🛒 Grocery</h2>
-                <p>Fresh Daily Needs</p>
-            </div>
-            <div class="card parcel" onclick="alert('Parcel Booking Coming Soon!')">
-                <h2>📦 Parcel</h2>
-                <p>Send Anywhere</p>
-            </div>
-        </div>
+        <section class="cards">
+            <a href="food.html" style="text-decoration:none;"><div class="card food"><h2>🍔 Order Food</h2></div></a>
+            <a href="medicine.html" style="text-decoration:none;"><div class="card medicine"><h2>💊 Medicines</h2></div></a>
+            <a href="grocery.html" style="text-decoration:none;"><div class="card grocery"><h2>🛒 Grocery</h2></div></a>
+            <a href="parcel.html" style="text-decoration:none;"><div class="card parcel"><h2>📦 Parcel</h2></div></a>
+        </section>
 
         <div class="orders">
             <h2>Recent Orders</h2>
@@ -97,6 +114,106 @@
         </div>
     </div>
 
+    <!-- Track Order Modal -->
+    <div id="trackOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Track Order</h2>
+                <span class="close" onclick="closeModal('trackOrderModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Order ID</label>
+                <input type="text" placeholder="Enter Order ID (e.g., QHP7842)">
+            </div>
+            <div class="map-container">
+                <img src="https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/77.594600,12.971600,13,500x300@2x?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycW1wbXVqMGZjd3gifQ.rJcFIG214AriISLbB6B5aw" alt="Map">
+            </div>
+            <div>
+                <p><b>Status:</b> Delivered</p>
+                <p><b>Delivery Partner:</b> Assigned</p>
+                <p><b>Coordinates:</b> 12.971600, 77.594600</p>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="closeModal('trackOrderModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <span class="close" onclick="closeModal('profileModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Partner</label>
+                <input type="text" placeholder="Partner Name" value="">
+            </div>
+            <div class="form-group">
+                <label>Phone number</label>
+                <input type="tel" placeholder="Enter Phone Number" value="">
+            </div>
+            <div class="form-group">
+                <label>Aadhaar number (12 digits)</label>
+                <input type="text" placeholder="Enter Aadhaar Number" value="">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="saveProfile()">Save profile</button>
+                <button class="btn btn-secondary btn-small" onclick="verifyClientModal()">Verify (client)</button>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="verifyServerModal()">Verify (server)</button>
+                <button class="btn btn-secondary" onclick="setLocationModal()">Set my location</button>
+            </div>
+            <div class="verified-status">Aadhaar not verified</div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+            </div>
+            
+            <h3 style="margin-bottom:15px; color:#333;">Username</h3>
+            <div class="form-group">
+                <input type="text" placeholder="Username" value="">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="updateUsername()">Update</button>
+            </div>
+
+            <h3 style="margin-top:25px; margin-bottom:15px; color:#333;">Change password (demo)</h3>
+            <div class="form-group">
+                <input type="password" placeholder="New password" value="">
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Confirm password" value="">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="changePasswordDemo()">Change</button>
+            </div>
+
+            <h3 style="margin-top:25px; margin-bottom:15px; color:#333;">Change password (server)</h3>
+            <div class="form-group">
+                <input type="password" placeholder="New password (server)" value="">
+            </div>
+            <div class="form-group">
+                <input type="password" placeholder="Confirm password" value="">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="changePasswordServer()">Change (Server)</button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="closeModal('settingsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Greeting
         function setGreeting() {
@@ -111,6 +228,68 @@
         // Open Grocery Selector
         function openGrocery() {
             window.open('grocery_selector.html', '_blank');
+        }
+
+        // Modal Functions
+        function openTrackOrder() {
+            document.getElementById('trackOrderModal').classList.add('show');
+        }
+
+        function openProfile() {
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function saveProfile() {
+            alert('Profile saved successfully!');
+        }
+
+        function verifyClientModal() {
+            alert('Client verification initiated!');
+        }
+
+        function verifyServerModal() {
+            alert('Server verification initiated!');
+        }
+
+        function setLocationModal() {
+            alert('Location setting feature coming soon!');
+        }
+
+        function updateUsername() {
+            alert('Username updated successfully!');
+        }
+
+        function changePasswordDemo() {
+            alert('Password changed successfully (demo)!');
+        }
+
+        function changePasswordServer() {
+            alert('Password changed successfully (server)!');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const trackOrderModal = document.getElementById('trackOrderModal');
+            const profileModal = document.getElementById('profileModal');
+            const settingsModal = document.getElementById('settingsModal');
+            
+            if (event.target === trackOrderModal) {
+                trackOrderModal.classList.remove('show');
+            }
+            if (event.target === profileModal) {
+                profileModal.classList.remove('show');
+            }
+            if (event.target === settingsModal) {
+                settingsModal.classList.remove('show');
+            }
         }
     </script>
 </body>
