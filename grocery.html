@@ -3,29 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grocery Categories with Smart Search</title>
+    <title>Grocery Categories - QHP</title>
     <style>
         :root {
-            --primary-color: #2e7d32;
-            --primary-hover: #1b5e20;
-            --bg-color: #f9f9f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+            --primary: #2962ff;
+            --accent: #FF5722;
+            --success: #2e7d32;
+            --bg: #f4f7fb;
+            --warning: #FFC107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 40px 20px;
+            background: var(--bg);
+            display: flex;
+            min-height: 100vh;
         }
 
-        .category-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            padding: 15px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Sidebar - WHITE BACKGROUND */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: #ffffff;
+            padding: 25px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            transition: 0.3s ease;
+        }
+
+        .sidebar-close {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0D47A1;
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 14px 15px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: #f5f5f5;
+        }
+
+        .sidebar li a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+        }
+
+        .sidebar li:hover {
+            background: #e8e8e8;
+            transform: translateX(5px);
+        }
+
+        .sidebar li.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar li.active a {
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 260px;
+            padding: 40px 20px;
+            width: calc(100% - 260px);
+            overflow-y: auto;
+            max-height: 100vh;
         }
 
         .category-header {
@@ -33,32 +150,37 @@
             margin-bottom: 30px;
         }
 
-        .category-header h2 {
-            font-size: 2rem;
-            color: var(--primary-color);
+        .category-header h1 {
+            font-size: 28px;
+            color: var(--primary);
             margin-bottom: 10px;
         }
 
-        /* Search Bar Styles */
+        .category-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Search Bar */
         .search-wrapper {
             max-width: 500px;
             margin: 0 auto 30px auto;
-            text-align: center;
         }
 
         .search-bar {
             width: 100%;
-            padding: 12px 20px;
-            font-size: 1rem;
-            border: 2px solid #ddd;
+            padding: 15px 20px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
             border-radius: 25px;
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: 0.3s;
             box-sizing: border-box;
         }
 
         .search-bar:focus {
-            border-color: var(--primary-color);
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(41, 98, 255, 0.2);
         }
 
         /* Grid Layout */
@@ -70,12 +192,12 @@
         }
 
         .category-card {
-            background: var(--card-bg);
+            background: white;
             border-radius: 12px;
             padding: 24px;
             text-align: center;
-            box-shadow: var(--shadow);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -87,13 +209,13 @@
 
         .category-card:hover {
             transform: translateY(-5px);
-            box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
 
-        /* Selected State */
         .category-card.selected {
-            border-color: var(--primary-color);
-            background-color: #e8f5e9;
+            border-color: var(--primary);
+            background-color: #f0f4ff;
             transform: scale(1.02);
         }
 
@@ -105,35 +227,54 @@
         .category-title {
             font-size: 1rem;
             font-weight: 600;
+            color: var(--primary);
         }
 
-        /* Action Footer for Submit Button */
+        /* Action Footer */
         .action-footer {
             text-align: center;
             margin-top: 20px;
             min-height: 50px;
+            margin-bottom: 30px;
         }
 
         .submit-btn {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 14px 40px;
-            font-size: 1.1rem;
+            padding: 15px 40px;
+            font-size: 16px;
             font-weight: 600;
-            border-radius: 30px;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(41, 98, 255, 0.3);
+            transition: all 0.3s ease;
             display: none;
+            margin-right: 10px;
         }
 
         .submit-btn:hover {
-            background-color: var(--primary-hover);
+            background-color: #1a47a0;
             transform: translateY(-2px);
         }
 
-        /* Popup / Modal Styles */
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn.show {
+            display: inline-block;
+        }
+
+        .secondary-btn {
+            background: #999;
+        }
+
+        .secondary-btn:hover {
+            background: #777;
+        }
+
+        /* Popup Modal */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -147,7 +288,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
-            z-index: 1000;
+            z-index: 2000;
         }
 
         .popup-overlay.active {
@@ -157,7 +298,7 @@
 
         .popup-box {
             background: white;
-            padding: 30px;
+            padding: 40px 30px;
             border-radius: 16px;
             text-align: center;
             max-width: 400px;
@@ -173,175 +314,445 @@
 
         .popup-box h3 {
             margin-top: 0;
-            color: var(--primary-color);
-            font-size: 1.5rem;
+            color: var(--primary);
+            font-size: 20px;
+            margin-bottom: 15px;
         }
 
         .popup-box p {
-            font-size: 1.1rem;
+            font-size: 15px;
             margin: 15px 0 25px 0;
+            color: #555;
+        }
+
+        .popup-box strong {
+            color: var(--primary);
+            font-weight: 700;
         }
 
         .close-btn {
-            background-color: #333;
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 10px 24px;
-            border-radius: 20px;
+            padding: 12px 30px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
+            transition: 0.3s;
         }
 
         .close-btn:hover {
-            background-color: #555;
+            background-color: #1a47a0;
+        }
+
+        /* Status Box */
+        .status-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary);
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 15px;
+            display: none;
+        }
+
+        .status-box.show {
+            display: block;
+        }
+
+        .status-box.success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+
+        .order-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+
+        .order-details.show {
+            display: block;
+        }
+
+        .order-details p {
+            margin: 10px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .order-details strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 4px solid rgba(41, 98, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+            display: none;
+        }
+
+        .spinner.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge.success {
+            background: var(--success);
+        }
+
+        .waiting-section, .confirmed-section {
+            display: none;
+        }
+
+        .waiting-section.show, .confirmed-section.show {
+            display: block;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                z-index: 999;
+                width: 240px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-close {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 80px 15px 40px 15px;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="category-container">
-    <div class="category-header">
-        <h2>Shop by Category</h2>
-        <p>Type an item (like apple, milk, rice) or select a category directly</p>
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
 
-    <div class="search-wrapper">
-        <input type="text" id="searchBar" class="search-bar" placeholder="Search items or categories (e.g., apple, milk, soap)...">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <span class="sidebar-close" id="sidebarClose">&times;</span>
+        <div class="logo">QHP <span>Partner</span></div>
+        <ul>
+            <li><a href="#">🏠 Dashboard</a></li>
+            <li><a href="#">🍔 Order Food</a></li>
+            <li><a href="#">💊 Medicine Order</a></li>
+            <li class="active"><a href="#">🛒 Grocery</a></li>
+            <li><a href="#">📦 Parcel Booking</a></li>
+            <li><a href="#">📍 Track Order</a></li>
+            <li><a href="#">💳 Wallet</a></li>
+            <li><a href="#">👤 Profile</a></li>
+            <li><a href="#">⚙️ Settings</a></li>
+        </ul>
+    </aside>
+
+    <main class="main">
+        <div class="category-header">
+            <h1>🛒 Grocery Shopping</h1>
+            <p>Search for items or select a category</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-wrapper">
+            <input type="text" id="searchBar" class="search-bar" placeholder="Search items (e.g., apple, milk, rice)...">
+        </div>
+
+        <!-- Category Grid -->
+        <div class="category-grid" id="categoryGrid">
+            <div class="category-card" data-name="fruits" data-keywords="apple banana mango orange grapes berries pomegranate watermelon fruit">
+                <span class="category-icon">🍎</span>
+                <span class="category-title">Fruits</span>
+            </div>
+
+            <div class="category-card" data-name="vegetables" data-keywords="potato onion tomato broccoli carrot cabbage spinach vegetable veggies">
+                <span class="category-icon">🥦</span>
+                <span class="category-title">Vegetables</span>
+            </div>
+
+            <div class="category-card" data-name="dairy & eggs" data-keywords="milk cheese butter paneer yogurt curd egg cream dairy">
+                <span class="category-icon">🥛</span>
+                <span class="category-title">Dairy & Eggs</span>
+            </div>
+
+            <div class="category-card" data-name="rice, atta & grains" data-keywords="rice atta flour wheat oats quinoa grains basmati chakki">
+                <span class="category-icon">🍚</span>
+                <span class="category-title">Rice, Atta & Grains</span>
+            </div>
+
+            <div class="category-card" data-name="pulses" data-keywords="dal pulses lentils chana moong rajma chickpeas beans">
+                <span class="category-icon">🌾</span>
+                <span class="category-title">Pulses</span>
+            </div>
+
+            <div class="category-card" data-name="oils & ghee" data-keywords="oil ghee mustard olive sunflower coconut oil fats">
+                <span class="category-icon">🫒</span>
+                <span class="category-title">Oils & Ghee</span>
+            </div>
+
+            <div class="category-card" data-name="spices & masalas" data-keywords="salt pepper turmeric chilli powder cumin coriander spices masalas haldi">
+                <span class="category-icon">🧂</span>
+                <span class="category-title">Spices & Masalas</span>
+            </div>
+
+            <div class="category-card" data-name="bakery" data-keywords="bread bun cake cookies toast pav bakery baked brown bread">
+                <span class="category-icon">🍞</span>
+                <span class="category-title">Bakery</span>
+            </div>
+
+            <div class="category-card" data-name="snacks" data-keywords="chips biscuits namkeen popcorn chocolate mixture snacks kurkure">
+                <span class="category-icon">🍪</span>
+                <span class="category-title">Snacks</span>
+            </div>
+
+            <div class="category-card" data-name="beverages" data-keywords="coffee tea juice soda cold drink water energy drink beverages">
+                <span class="category-icon">☕</span>
+                <span class="category-title">Beverages</span>
+            </div>
+
+            <div class="category-card" data-name="household" data-keywords="soap detergent cleaner phenyl scrubber garbage bag dishwash">
+                <span class="category-icon">🧼</span>
+                <span class="category-title">Household</span>
+            </div>
+
+            <div class="category-card" data-name="personal care" data-keywords="shampoo brush toothpaste lotion cream face wash deodorant sanitizer">
+                <span class="category-icon">🧴</span>
+                <span class="category-title">Personal Care</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-footer">
+            <button id="submitBtn" class="submit-btn">✅ Submit Selection</button>
+            <button id="clearBtn" class="submit-btn secondary-btn">🔄 Clear</button>
+        </div>
+
+        <!-- Waiting Section -->
+        <div class="waiting-section" id="waitingSection">
+            <div class="status-box show">
+                🕐 Processing your grocery order...
+            </div>
+            <div class="order-details show">
+                <p><strong>Order ID:</strong> <span id="orderId">#GRO-001</span></p>
+                <p><strong>Selected Category:</strong> <span id="displayCategory">-</span></p>
+                <p><strong>Status:</strong> Processing</p>
+                <span class="badge">⏳ PROCESSING</span>
+            </div>
+            <div class="spinner show"></div>
+        </div>
+
+        <!-- Confirmed Section -->
+        <div class="confirmed-section" id="confirmedSection">
+            <div class="status-box show success">
+                ✅ Grocery order confirmed!
+            </div>
+            <div class="order-details show">
+                <p><strong>Order ID:</strong> <span id="orderId2">#GRO-001</span></p>
+                <p><strong>Category:</strong> <span id="displayCategory2">-</span></p>
+                <p><strong>Status:</strong> <span style="color: var(--success); font-weight: bold;">✅ Confirmed</span></p>
+                <p><strong>Estimated Delivery:</strong> <span id="estimatedDelivery">1-2 hours</span></p>
+                <span class="badge success">✅ CONFIRMED</span>
+            </div>
+            <button onclick="proceedToPayment()" class="submit-btn">💳 Proceed to Payment</button>
+            <button onclick="backToSelection()" class="submit-btn secondary-btn">⬅️ Back</button>
+        </div>
+    </main>
+
+    <!-- Popup Modal -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-box">
+            <h3>✅ Success!</h3>
+            <p id="popupMessage">You have selected <strong>Fruits</strong></p>
+            <button class="close-btn" id="closePopupBtn">Close</button>
+        </div>
     </div>
 
-    <div class="category-grid" id="categoryGrid">
-        
-        <div class="category-card" data-name="fruits" data-keywords="apple banana mango orange grapes berries pomegranate watermelon fruit">
-            <span class="category-icon" role="img" aria-label="Fruits">🍎</span>
-            <span class="category-title">Fruits</span>
-        </div>
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const searchBar = document.getElementById('searchBar');
+        const cards = document.querySelectorAll('.category-card');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const categoryGrid = document.getElementById('categoryGrid');
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupMessage = document.getElementById('popupMessage');
+        const closePopupBtn = document.getElementById('closePopupBtn');
+        const waitingSection = document.getElementById('waitingSection');
+        const confirmedSection = document.getElementById('confirmedSection');
 
-        <div class="category-card" data-name="vegetables" data-keywords="potato onion tomato broccoli carrot cabbage spinach vegetable veggies">
-            <span class="category-icon" role="img" aria-label="Vegetables">🥦</span>
-            <span class="category-title">Vegetables</span>
-        </div>
+        let selectedCategory = "";
+        let currentOrderId;
 
-        <div class="category-card" data-name="dairy & eggs" data-keywords="milk cheese butter paneer yogurt curd egg cream dairy">
-            <span class="category-icon" role="img" aria-label="Dairy & Eggs">🥛</span>
-            <span class="category-title">Dairy & Eggs</span>
-        </div>
+        // Hamburger Menu Toggle
+        hamburger.addEventListener('click', function() {
+            this.classList.toggle('active');
+            sidebar.classList.toggle('active');
+        });
 
-        <div class="category-card" data-name="rice, atta & grains" data-keywords="rice atta flour wheat oats quinoa grains basmati chakki">
-            <span class="category-icon" role="img" aria-label="Rice, Atta & Grains">🍚</span>
-            <span class="category-title">Rice, Atta & Grains</span>
-        </div>
+        sidebarClose.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            sidebar.classList.remove('active');
+        });
 
-        <div class="category-card" data-name="pulses" data-keywords="dal pulses lentils chana moong rajma chickpeas beans">
-            <span class="category-icon" role="img" aria-label="Pulses">🌾</span>
-            <span class="category-title">Pulses</span>
-        </div>
+        // Close sidebar when clicking a link
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                sidebar.classList.remove('active');
+            });
+        });
 
-        <div class="category-card" data-name="oils & ghee" data-keywords="oil ghee mustard olive sunflower coconut oil fats">
-            <span class="category-icon" role="img" aria-label="Oils & Ghee">🫒</span>
-            <span class="category-title">Oils & Ghee</span>
-        </div>
+        // Smart Search
+        searchBar.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
 
-        <div class="category-card" data-name="spices & masalas" data-keywords="salt pepper turmeric chilli powder cumin coriander spices masalas haldi">
-            <span class="category-icon" role="img" aria-label="Spices & Masalas">🧂</span>
-            <span class="category-title">Spices & Masalas</span>
-        </div>
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                const keywords = card.getAttribute('data-keywords');
 
-        <div class="category-card" data-name="bakery" data-keywords="bread bun cake cookies toast pav bakery baked brown bread">
-            <span class="category-icon" role="img" aria-label="Bakery">🍞</span>
-            <span class="category-title">Bakery</span>
-        </div>
+                if (query === '' || name.includes(query) || keywords.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
 
-        <div class="category-card" data-name="snacks" data-keywords="chips chips biscuits namkeen popcorn chocolate mixture snacks kurkure">
-            <span class="category-icon" role="img" aria-label="Snacks">🍪</span>
-            <span class="category-title">Snacks</span>
-        </div>
-
-        <div class="category-card" data-name="beverages" data-keywords="coffee tea juice soda cold drink water energy drink beverages drink">
-            <span class="category-icon" role="img" aria-label="Beverages">☕</span>
-            <span class="category-title">Beverages</span>
-        </div>
-
-        <div class="category-card" data-name="household" data-keywords="soap detergent cleaner phenyl scrubber garbage bag dishwash household cleaner">
-            <span class="category-icon" role="img" aria-label="Household">🧼</span>
-            <span class="category-title">Household</span>
-        </div>
-
-        <div class="category-card" data-name="personal care" data-keywords="shampoo brush toothpaste lotion cream face wash deodorant personal care sanitizer">
-            <span class="category-icon" role="img" aria-label="Personal Care">🧴</span>
-            <span class="category-title">Personal Care</span>
-        </div>
-        
-    </div>
-
-    <div class="action-footer">
-        <button id="submitBtn" class="submit-btn">Submit Selection</button>
-    </div>
-</div>
-
-<div class="popup-overlay" id="popupOverlay">
-    <div class="popup-box">
-        <h3>Success!</h3>
-        <p id="popupMessage">You have selected a category.</p>
-        <button class="close-btn" id="closePopupBtn">Close</button>
-    </div>
-</div>
-
-<script>
-    const searchBar = document.getElementById('searchBar');
-    const cards = document.querySelectorAll('.category-card');
-    const submitBtn = document.getElementById('submitBtn');
-    const popupOverlay = document.getElementById('popupOverlay');
-    const popupMessage = document.getElementById('popupMessage');
-    const closePopupBtn = document.getElementById('closePopupBtn');
-    
-    let selectedCategory = "";
-
-    // 1. Smart Real-time Search Filtering (checks names + keywords)
-    searchBar.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        
+        // Category Selection
         cards.forEach(card => {
-            const name = card.getAttribute('data-name');
-            const keywords = card.getAttribute('data-keywords');
-            
-            // Check if the query matches the title OR any of the item keywords
-            if (name.includes(query) || keywords.includes(query)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
+            card.addEventListener('click', () => {
+                cards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedCategory = card.querySelector('.category-title').textContent;
+                submitBtn.classList.add('show');
+                clearBtn.classList.add('show');
+            });
+        });
+
+        // Submit Button
+        submitBtn.addEventListener('click', () => {
+            if (selectedCategory) {
+                currentOrderId = '#GRO-' + Math.floor(Math.random() * 900000 + 100000);
+
+                // Hide category grid, show waiting section
+                categoryGrid.style.display = 'none';
+                document.querySelector('.action-footer').style.display = 'none';
+                waitingSection.classList.add('show');
+
+                document.getElementById('orderId').textContent = currentOrderId;
+                document.getElementById('displayCategory').textContent = selectedCategory;
+
+                // Show popup
+                popupMessage.innerHTML = `You have selected <strong>${selectedCategory}</strong>`;
+                popupOverlay.classList.add('active');
+
+                // Simulate confirmation after 3 seconds
+                setTimeout(() => {
+                    confirmOrder();
+                }, 3500);
             }
         });
-    });
 
-    // 2. Selection logic & showing submit button
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
+        // Confirm Order
+        function confirmOrder() {
+            waitingSection.classList.remove('show');
+            confirmedSection.classList.add('show');
+
+            document.getElementById('orderId2').textContent = currentOrderId;
+            document.getElementById('displayCategory2').textContent = selectedCategory;
+
+            const times = ['1-2 hours', '2-3 hours', '30-45 mins', '45-60 mins'];
+            document.getElementById('estimatedDelivery').textContent = times[Math.floor(Math.random() * times.length)];
+        }
+
+        // Proceed to Payment
+        function proceedToPayment() {
+            alert('💳 Proceeding to Payment...\n\nOrder ID: ' + currentOrderId);
+        }
+
+        // Back to Selection
+        function backToSelection() {
+            selectedCategory = '';
             cards.forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            selectedCategory = card.querySelector('.category-title').textContent;
-            submitBtn.style.display = 'inline-block';
+            categoryGrid.style.display = 'grid';
+            document.querySelector('.action-footer').style.display = 'block';
+            submitBtn.classList.remove('show');
+            clearBtn.classList.remove('show');
+            waitingSection.classList.remove('show');
+            confirmedSection.classList.remove('show');
+        }
+
+
+
+
+        // Clear Selection
+        clearBtn.addEventListener('click', () => {
+            backToSelection();
         });
-    });
 
-    // 3. Submit and show Popup
-    submitBtn.addEventListener('click', () => {
-        if(selectedCategory) {
-            popupMessage.innerHTML = `You successfully processed: <strong>${selectedCategory}</strong>`;
-            popupOverlay.classList.add('active');
-        }
-    });
-
-    // 4. Close Popup
-    closePopupBtn.addEventListener('click', () => {
-        popupOverlay.classList.remove('active');
-    });
-
-    popupOverlay.addEventListener('click', (e) => {
-        if(e.target === popupOverlay) {
+        // Popup Close
+        closePopupBtn.addEventListener('click', () => {
             popupOverlay.classList.remove('active');
-        }
-    });
-</script>
+        });
+
+        popupOverlay.addEventListener('click', (e) => {
+            if (e.target === popupOverlay) {
+                popupOverlay.classList.remove('active');
+            }
+        });
+    </script>
 
 </body>
 </html>
